@@ -27,7 +27,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: Duration(milliseconds: 300),
+      duration: Duration(milliseconds: 500),
       vsync: this,
     );
   }
@@ -43,30 +43,44 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
     return GestureDetector(
       onVerticalDragUpdate: (details) {
         setState(() {
-          _currentHeight -= details.delta.dy;
+          // 增加拖拽敏感度，让滑动更跟手
+          _currentHeight -= details.delta.dy * 1.2;
           _currentHeight = _currentHeight.clamp(_minHeight, _maxHeight);
         });
       },
       onVerticalDragEnd: (details) {
-        if (_currentHeight > (_minHeight + _maxHeight) / 2) {
+        // 根据拖拽速度和位置来决定展开或收起
+        double velocity = details.primaryVelocity ?? 0;
+
+        if (velocity < -300) {
+          // 快速向上滑动，展开
           _expandSheet();
-        } else {
+        } else if (velocity > 300) {
+          // 快速向下滑动，收起
           _collapseSheet();
+        } else {
+          // 根据位置判断
+          if (_currentHeight > (_minHeight + _maxHeight) / 2) {
+            _expandSheet();
+          } else {
+            _collapseSheet();
+          }
         }
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 250),
+        curve: Cubic(0.175, 0.885, 0.32, 1.1),
         height: _currentHeight,
         decoration: BoxDecoration(
-          color: CupertinoColors.systemBackground,
+          color: CupertinoColors.systemBackground.withOpacity(0.8),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(12),
             topRight: Radius.circular(12),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 6,
               offset: Offset(0, -1),
             ),
           ],
@@ -96,7 +110,7 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
             ),
             // 分割线在Quick Actions底部，延伸到全宽
             Container(
-              height: 0.5,
+              height: 0.33,
               width: double.infinity,
               color: CupertinoColors.systemGrey4,
             ),

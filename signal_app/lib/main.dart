@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'widgets/draggable_bottom_sheet.dart';
+import 'pages/home_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -60,18 +62,24 @@ class MyHomePage extends StatelessWidget {
       ),
       bottomNavigationBar: CupertinoTabBar(
         currentIndex: appState.selectedIndex,
-        onTap: (index) => appState.setSelectedIndex(index),
+        onTap: (index) {
+          HapticFeedback.lightImpact();
+          appState.setSelectedIndex(index);
+        },
         backgroundColor: CupertinoColors.systemBackground.withOpacity(0.8),
         activeColor: CupertinoColors.systemBlue,
         inactiveColor: CupertinoColors.systemGrey,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: Icon(CupertinoIcons.tray_fill, size: 22),
+            label: 'Inbox',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
+            icon: Icon(CupertinoIcons.scope, size: 22),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings, size: 22),
             label: 'Settings',
           ),
         ],
@@ -82,11 +90,11 @@ class MyHomePage extends StatelessWidget {
   Widget _buildBody(MyAppState appState) {
     switch (appState.selectedIndex) {
       case 0:
-        return CupertinoPageScaffold(child: _buildHomeTab(appState));
+        return HomePage(appState: appState);
       case 1:
         return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(middle: Text('Favorites')),
-          child: _buildFavoritesTab(),
+          navigationBar: CupertinoNavigationBar(middle: Text('Explore')),
+          child: _buildExploreTab(),
         );
       case 2:
         return CupertinoPageScaffold(
@@ -98,21 +106,10 @@ class MyHomePage extends StatelessWidget {
     }
   }
 
-  Widget _buildHomeTab(MyAppState appState) {
+  Widget _buildExploreTab() {
     return SafeArea(
       child: Center(
-        child: Text(
-          'Home Page',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFavoritesTab() {
-    return SafeArea(
-      child: Center(
-        child: Text('Favorites will go here', style: TextStyle(fontSize: 18)),
+        child: Text('Explore will go here', style: TextStyle(fontSize: 18)),
       ),
     );
   }
@@ -128,9 +125,9 @@ class MyHomePage extends StatelessWidget {
   String _getTitleForCurrentTab(int index) {
     switch (index) {
       case 0:
-        return 'Home';
+        return 'Inbox';
       case 1:
-        return 'Favorites';
+        return 'Explore';
       case 2:
         return 'Settings';
       default:
