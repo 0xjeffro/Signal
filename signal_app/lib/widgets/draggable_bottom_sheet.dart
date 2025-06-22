@@ -4,8 +4,13 @@ import '../main.dart';
 
 class DraggableBottomSheet extends StatefulWidget {
   final MyAppState appState;
+  final String title;
 
-  const DraggableBottomSheet({super.key, required this.appState});
+  const DraggableBottomSheet({
+    super.key,
+    required this.appState,
+    this.title = 'Quick Actions',
+  });
 
   @override
   State<DraggableBottomSheet> createState() => _DraggableBottomSheetState();
@@ -78,13 +83,13 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            // Quick Actions文本
+            // 标题文本
             Padding(
               padding: EdgeInsets.fromLTRB(16, 6, 16, 6),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Quick Actions',
+                  widget.title,
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),

@@ -51,7 +51,10 @@ class MyHomePage extends StatelessWidget {
             bottom: 0,
             left: 0,
             right: 0,
-            child: DraggableBottomSheet(appState: appState),
+            child: DraggableBottomSheet(
+              appState: appState,
+              title: _getTitleForCurrentTab(appState.selectedIndex),
+            ),
           ),
         ],
       ),
@@ -120,5 +123,18 @@ class MyHomePage extends StatelessWidget {
         child: Text('Settings will go here', style: TextStyle(fontSize: 18)),
       ),
     );
+  }
+
+  String _getTitleForCurrentTab(int index) {
+    switch (index) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Favorites';
+      case 2:
+        return 'Settings';
+      default:
+        return 'Quick Actions';
+    }
   }
 }
