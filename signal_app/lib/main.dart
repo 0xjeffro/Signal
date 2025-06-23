@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'widgets/draggable_bottom_sheet.dart';
 import 'pages/home_page.dart';
+import 'pages/explore_page.dart';
+import 'pages/settings_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -46,9 +49,14 @@ class MyHomePage extends StatelessWidget {
     var appState = context.watch<MyAppState>();
 
     return Scaffold(
+      backgroundColor:
+          MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? CupertinoColors.systemBackground.resolveFrom(context)
+          : Color(0xFFEEF0F4),
       body: Stack(
         children: [
-          _buildBody(appState),
+          // 让背景内容延伸到底部，为毛玻璃效果提供背景
+          Positioned.fill(child: _buildBody(appState)),
           Positioned(
             bottom: 0,
             left: 0,
@@ -60,29 +68,50 @@ class MyHomePage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: CupertinoTabBar(
-        currentIndex: appState.selectedIndex,
-        onTap: (index) {
-          HapticFeedback.lightImpact();
-          appState.setSelectedIndex(index);
-        },
-        backgroundColor: CupertinoColors.systemBackground.withOpacity(0.8),
-        activeColor: CupertinoColors.systemBlue,
-        inactiveColor: CupertinoColors.systemGrey,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.tray_fill, size: 22),
-            label: 'Inbox',
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color:
+                  MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? CupertinoColors.systemGrey5
+                        .resolveFrom(context)
+                        .withOpacity(0.5)
+                  : CupertinoColors.systemBackground
+                        .resolveFrom(context)
+                        .withOpacity(0.5),
+            ),
+            child: CupertinoTabBar(
+              currentIndex: appState.selectedIndex,
+              onTap: (index) {
+                HapticFeedback.lightImpact();
+                appState.setSelectedIndex(index);
+              },
+              backgroundColor: Colors.transparent,
+              activeColor: CupertinoColors.systemBlue.resolveFrom(context),
+              inactiveColor: CupertinoColors.systemGrey.resolveFrom(context),
+              border: null,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.tray_fill, size: 22),
+                  label: 'Inbox',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(
+                    CupertinoIcons.bolt_horizontal_circle_fill,
+                    size: 22,
+                  ),
+                  label: 'Explore',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.settings, size: 22),
+                  label: 'Settings',
+                ),
+              ],
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.scope, size: 22),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings, size: 22),
-            label: 'Settings',
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -92,15 +121,9 @@ class MyHomePage extends StatelessWidget {
       case 0:
         return HomePage(appState: appState);
       case 1:
-        return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(middle: Text('Explore')),
-          child: _buildExploreTab(),
-        );
+        return ExplorePage();
       case 2:
-        return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(middle: Text('Settings')),
-          child: _buildSettingsTab(),
-        );
+        return SettingsPage();
       default:
         return Container();
     }
@@ -110,14 +133,6 @@ class MyHomePage extends StatelessWidget {
     return SafeArea(
       child: Center(
         child: Text('Explore will go here', style: TextStyle(fontSize: 18)),
-      ),
-    );
-  }
-
-  Widget _buildSettingsTab() {
-    return SafeArea(
-      child: Center(
-        child: Text('Settings will go here', style: TextStyle(fontSize: 18)),
       ),
     );
   }

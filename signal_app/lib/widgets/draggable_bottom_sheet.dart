@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../main.dart';
 
 class DraggableBottomSheet extends StatefulWidget {
@@ -71,52 +72,64 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
         duration: Duration(milliseconds: 250),
         curve: Cubic(0.175, 0.885, 0.32, 1.1),
         height: _currentHeight,
-        decoration: BoxDecoration(
-          color: CupertinoColors.systemBackground.withOpacity(0.8),
+        child: ClipRRect(
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
+            topLeft: Radius.circular(8),
+            topRight: Radius.circular(8),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 6,
-              offset: Offset(0, -1),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Drag Handle
-            Container(
-              margin: EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
               decoration: BoxDecoration(
-                color: CupertinoColors.systemGrey3,
-                borderRadius: BorderRadius.circular(2),
+                color:
+                    MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? CupertinoColors.systemGrey5
+                          .resolveFrom(context)
+                          .withOpacity(0.7)
+                    : CupertinoColors.systemBackground
+                          .resolveFrom(context)
+                          .withOpacity(0.7),
+                // 移除边框，让与tabbar完全融合
+              ),
+              child: Column(
+                children: [
+                  // Drag Handle
+                  Container(
+                    margin: EdgeInsets.only(top: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.systemGrey3.resolveFrom(context),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  // 标题文本
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(16, 6, 16, 6),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: CupertinoColors.label.resolveFrom(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 分割线在Quick Actions底部，延伸到全宽
+                  Container(
+                    height: 0.33,
+                    width: double.infinity,
+                    color: CupertinoColors.systemGrey4.resolveFrom(context),
+                  ),
+                  // 剩余空间
+                  Expanded(child: Container()),
+                ],
               ),
             ),
-            // 标题文本
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 6, 16, 6),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.title,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            // 分割线在Quick Actions底部，延伸到全宽
-            Container(
-              height: 0.33,
-              width: double.infinity,
-              color: CupertinoColors.systemGrey4,
-            ),
-            // 剩余空间
-            Expanded(child: Container()),
-          ],
+          ),
         ),
       ),
     );

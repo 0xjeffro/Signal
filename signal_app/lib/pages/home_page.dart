@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../main.dart';
+import '../widgets/custom_refresh_control.dart';
 
 class HomePage extends StatefulWidget {
   final MyAppState appState;
@@ -12,144 +11,33 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  bool _isRefreshing = false;
-  bool _hasTriggeredHaptic = false;
-  late AnimationController _bounceController;
-  late Animation<double> _bounceAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _bounceController = AnimationController(
-      duration: Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _bounceAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
-      CurvedAnimation(parent: _bounceController, curve: Curves.easeOutBack),
-    );
-  }
-
-  @override
-  void dispose() {
-    _bounceController.dispose();
-    super.dispose();
-  }
-
+class _HomePageState extends State<HomePage> {
   Future<void> _handleRefresh() async {
     print('开始刷新');
-    setState(() {
-      _isRefreshing = true;
-      _hasTriggeredHaptic = false;
-    });
-
-    await Future.delayed(Duration(seconds: 2));
-
+    // 模拟网络请求
+    await Future.delayed(Duration(seconds: 1));
     print('刷新完成');
-    setState(() {
-      _isRefreshing = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor:
+          MediaQuery.of(context).platformBrightness == Brightness.dark
+          ? CupertinoColors.systemBackground.resolveFrom(context)
+          : Color(0xFFEEF0F4),
       child: CustomScrollView(
         slivers: [
-          // iOS风格的下拉刷新
-          CupertinoSliverRefreshControl(
-            onRefresh: _handleRefresh,
-            refreshTriggerPullDistance: 60.0,
-            refreshIndicatorExtent: 60.0,
-            builder:
-                (
-                  context,
-                  refreshState,
-                  pulledExtent,
-                  refreshTriggerPullDistance,
-                  refreshIndicatorExtent,
-                ) {
-                  final topPadding = MediaQuery.of(context).padding.top;
-
-                  // 当达到触发距离时提供触感反馈
-                  if (refreshState == RefreshIndicatorMode.armed &&
-                      !_isRefreshing &&
-                      !_hasTriggeredHaptic) {
-                    _hasTriggeredHaptic = true;
-                    HapticFeedback.mediumImpact();
-                    _bounceController.forward().then((_) {
-                      _bounceController.reverse();
-                    });
-                  }
-
-                  // 重置状态
-                  if (refreshState == RefreshIndicatorMode.inactive) {
-                    _hasTriggeredHaptic = false;
-                    _bounceController.reset();
-                  }
-
-                  Widget indicator;
-
-                  if (refreshState == RefreshIndicatorMode.refresh ||
-                      _isRefreshing) {
-                    // 刷新状态：显示标准的加载动画
-                    indicator = CupertinoActivityIndicator(radius: 12.0);
-                  } else {
-                    // 下拉状态：只显示向下箭头
-                    double pullProgress =
-                        (pulledExtent / refreshTriggerPullDistance).clamp(
-                          0.0,
-                          1.0,
-                        );
-                    bool isArmed = refreshState == RefreshIndicatorMode.armed;
-
-                    // 计算动画属性
-                    double iconOpacity = (pullProgress * 1.5).clamp(0.0, 1.0);
-                    double iconSize = 18.0 + pullProgress * 6.0;
-                    Color iconColor = isArmed
-                        ? CupertinoColors.activeBlue
-                        : CupertinoColors.systemGrey2.withOpacity(0.8);
-
-                    indicator = AnimatedBuilder(
-                      animation: _bounceAnimation,
-                      builder: (context, child) {
-                        double scale = isArmed
-                            ? _bounceAnimation.value
-                            : (0.7 + pullProgress * 0.3);
-
-                        return Transform.scale(
-                          scale: scale,
-                          child: AnimatedOpacity(
-                            opacity: iconOpacity,
-                            duration: Duration(milliseconds: 100),
-                            child: Icon(
-                              CupertinoIcons.chevron_down,
-                              size: iconSize,
-                              color: iconColor,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }
-
-                  return Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: topPadding + 30.0,
-                        bottom: 8.0,
-                      ),
-                      child: indicator,
-                    ),
-                  );
-                },
-          ),
+          // 使用自定义的下拉刷新组件
+          CustomRefreshControl(onRefresh: _handleRefresh),
 
           // iOS风格的Collapsing Navigation Bar
           CupertinoSliverNavigationBar(
             largeTitle: Text('Inbox'),
-            backgroundColor: CupertinoColors.systemBackground,
+            backgroundColor:
+                MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? CupertinoColors.systemBackground.resolveFrom(context)
+                : Color(0xFFEEF0F4),
           ),
 
           // Sticky Row - 吸顶效果
@@ -159,7 +47,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               minHeight: 60.0,
               maxHeight: 60.0,
               child: Container(
-                color: CupertinoColors.systemBackground,
+                color:
+                    MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? CupertinoColors.systemBackground.resolveFrom(context)
+                    : Color(0xFFEEF0F4),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -230,7 +121,34 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Text('滚动查看iOS原生Collapsing效果', style: TextStyle(fontSize: 16)),
                   SizedBox(height: 400),
                   Text('继续滚动...', style: TextStyle(fontSize: 16)),
-                  SizedBox(height: 200),
+                  SizedBox(height: 100),
+                  // 添加一些明显的背景内容来测试毛玻璃效果
+                  Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          CupertinoColors.systemBlue,
+                          CupertinoColors.systemPurple,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '测试毛玻璃效果\n这些内容应该在底部sheet后面模糊显示',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: CupertinoColors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 100),
                 ],
               ),
             ),
