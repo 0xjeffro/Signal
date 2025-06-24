@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'widgets/draggable_bottom_sheet.dart';
+import 'widgets/custom_tab_bar.dart';
 import 'pages/home_page.dart';
 import 'pages/explore_page.dart';
 import 'pages/settings_page.dart';
@@ -105,51 +104,7 @@ class MyHomePage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            decoration: BoxDecoration(
-              color:
-                  MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? CupertinoColors.systemGrey5
-                        .resolveFrom(context)
-                        .withOpacity(0.5)
-                  : CupertinoColors.systemBackground
-                        .resolveFrom(context)
-                        .withOpacity(0.5),
-            ),
-            child: CupertinoTabBar(
-              currentIndex: appState.selectedIndex,
-              onTap: (index) {
-                HapticFeedback.lightImpact();
-                appState.setSelectedIndex(index);
-              },
-              backgroundColor: Colors.transparent,
-              activeColor: CupertinoColors.systemBlue.resolveFrom(context),
-              inactiveColor: CupertinoColors.systemGrey.resolveFrom(context),
-              border: null,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(CupertinoIcons.tray_fill, size: 22),
-                  label: 'Inbox',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(
-                    CupertinoIcons.bolt_horizontal_circle_fill,
-                    size: 22,
-                  ),
-                  label: 'Explore',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings, size: 22),
-                  label: 'Settings',
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      bottomNavigationBar: CustomTabBar(),
     );
   }
 

@@ -99,15 +99,12 @@ class _HomePageState extends State<HomePage> {
             ? CupertinoColors.systemGrey6.resolveFrom(context)
             : CupertinoColors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: CupertinoColors.systemGrey
-                .resolveFrom(context)
-                .withOpacity(0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
+        border: Border.all(
+          color: CupertinoColors.systemGrey5
+              .resolveFrom(context)
+              .withOpacity(0.3),
+          width: 0.5,
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.all(16),
