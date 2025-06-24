@@ -30,6 +30,17 @@ class MyAppState extends ChangeNotifier {
   int selectedIndex = 0;
   bool isBottomSheetExpanded = false;
 
+  // 集合相关状态
+  String selectedCollection = 'All';
+  List<String> collections = [
+    'All',
+    'iOS开发',
+    'Flutter',
+    'Apple',
+    '设计规范',
+    '工具技巧',
+  ];
+
   void setSelectedIndex(int index) {
     selectedIndex = index;
     notifyListeners();
@@ -37,6 +48,32 @@ class MyAppState extends ChangeNotifier {
 
   void toggleBottomSheet() {
     isBottomSheetExpanded = !isBottomSheetExpanded;
+    notifyListeners();
+  }
+
+  void setSelectedCollection(String collection) {
+    selectedCollection = collection;
+    notifyListeners();
+  }
+
+  void addCollection(String collectionName) {
+    if (!collections.contains(collectionName)) {
+      collections.add(collectionName);
+      notifyListeners();
+    }
+  }
+
+  void reorderCollections(int oldIndex, int newIndex) {
+    // 保护 "All" 标签，它始终在第一位
+    if (oldIndex == 0 || newIndex == 0) return;
+
+    // 调整索引，因为ReorderableListView的逻辑
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    final String item = collections.removeAt(oldIndex);
+    collections.insert(newIndex, item);
     notifyListeners();
   }
 }

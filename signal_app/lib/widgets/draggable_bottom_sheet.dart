@@ -105,13 +105,13 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                   ),
                   // 标题文本
                   Padding(
-                    padding: EdgeInsets.fromLTRB(16, 6, 16, 6),
+                    padding: EdgeInsets.fromLTRB(16, 0, 16, 9),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.title,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: CupertinoColors.label.resolveFrom(context),
                         ),
