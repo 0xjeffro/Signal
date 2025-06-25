@@ -122,7 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildUserProfileCard(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: MediaQuery.of(context).platformBrightness == Brightness.dark
             ? CupertinoColors.systemGrey6.resolveFrom(context)
@@ -139,10 +139,17 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           // 头像
           Container(
-            width: 60,
-            height: 60,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
+              border: Border.all(
+                color:
+                    MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? CupertinoColors.systemGrey4.resolveFrom(context)
+                    : CupertinoColors.systemGrey5.resolveFrom(context),
+                width: 2,
+              ),
               gradient: LinearGradient(
                 colors: [
                   CupertinoColors.systemBlue,
@@ -163,7 +170,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          SizedBox(width: 16),
+          SizedBox(width: 12),
 
           // 用户信息
           Expanded(
@@ -171,27 +178,32 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'John Doe',
+                  'Johan Ng',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: CupertinoColors.label.resolveFrom(context),
+                    height: 1.2,
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 0),
                 Text(
-                  'john.doe@example.com',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  '@johndoe',
+                  'johan.ng@example.com',
                   style: TextStyle(
                     fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                    height: 1.2,
+                  ),
+                ),
+                SizedBox(height: -1),
+                Text(
+                  '@johanng',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
                     color: CupertinoColors.systemBlue.resolveFrom(context),
+                    height: 1.2,
                   ),
                 ),
               ],
@@ -238,7 +250,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _buildSettingsItem(context, items[i]),
             if (i < items.length - 1)
               Container(
-                margin: EdgeInsets.only(left: 56),
+                margin: EdgeInsets.only(left: 58),
                 height: 0.5,
                 color: CupertinoColors.systemGrey4.resolveFrom(context),
               ),
@@ -253,16 +265,16 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: EdgeInsets.zero,
       onPressed: item.onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           children: [
             // 图标
             Container(
-              width: 28,
-              height: 28,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
-                color: item.iconColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
+                color: item.iconColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(7),
               ),
               child: Icon(item.icon, color: item.iconColor, size: 18),
             ),
@@ -282,11 +294,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   if (item.subtitle != null) ...[
-                    SizedBox(height: 2),
+                    SizedBox(height: 1),
                     Text(
                       item.subtitle!,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         color: CupertinoColors.secondaryLabel.resolveFrom(
                           context,
                         ),
@@ -301,7 +313,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Icon(
               CupertinoIcons.chevron_right,
               color: CupertinoColors.systemGrey3.resolveFrom(context),
-              size: 16,
+              size: 14,
             ),
           ],
         ),
@@ -328,16 +340,16 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: EdgeInsets.zero,
         onPressed: () => _showLogOutConfirmation(context),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
               // 图标
               Container(
-                width: 28,
-                height: 28,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
-                  color: CupertinoColors.systemRed.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
+                  color: CupertinoColors.systemRed.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(7),
                 ),
                 child: Icon(
                   CupertinoIcons.square_arrow_right,
