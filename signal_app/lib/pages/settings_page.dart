@@ -39,11 +39,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   items: [
                     _SettingsItem(
-                      icon: CupertinoIcons.person_circle,
+                      icon: CupertinoIcons.creditcard,
                       iconColor: CupertinoColors.systemBlue,
-                      title: 'Account',
-                      subtitle: 'Privacy, Security, Change email',
-                      onTap: () => _showComingSoon(context, 'Account'),
+                      title: 'Wallet',
+                      subtitle: 'Balance, Security, Transaction history',
+                      onTap: () => _showComingSoon(context, 'Wallet'),
                     ),
                     _SettingsItem(
                       icon: CupertinoIcons.chat_bubble_2,
@@ -188,7 +188,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 SizedBox(height: 0),
                 Text(
-                  'johan.ng@example.com',
+                  '+1 (555) 123-4567',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -210,16 +210,16 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ),
 
-          // 编辑按钮
+          // 进入按钮
           CupertinoButton(
             padding: EdgeInsets.zero,
             minSize: 0,
             child: Icon(
-              CupertinoIcons.pencil,
-              color: CupertinoColors.systemBlue.resolveFrom(context),
-              size: 20,
+              CupertinoIcons.chevron_right,
+              color: CupertinoColors.systemGrey3.resolveFrom(context),
+              size: 16,
             ),
-            onPressed: () => _showComingSoon(context, 'Edit Profile'),
+            onPressed: () => _showComingSoon(context, 'Profile'),
           ),
         ],
       ),
