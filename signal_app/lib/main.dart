@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: CupertinoApp(
-        theme: CupertinoThemeData(primaryColor: CupertinoColors.systemOrange),
+        theme: CupertinoThemeData(primaryColor: Color(0xFF2461ED)),
         home: MyHomePage(),
       ),
     );
