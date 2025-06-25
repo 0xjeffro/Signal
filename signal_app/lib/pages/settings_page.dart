@@ -107,10 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
 
-                // Log Out 按钮
-                _buildLogOutButton(context),
-
-                SizedBox(height: 100), // 为bottom sheet留空间
+                SizedBox(height: 120), // 为bottom sheet留空间
               ],
             ),
           ),
@@ -321,103 +318,6 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildLogOutButton(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? CupertinoColors.systemGrey6.resolveFrom(context)
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: CupertinoColors.systemGrey5
-              .resolveFrom(context)
-              .withOpacity(0.3),
-          width: 0.5,
-        ),
-      ),
-      child: CupertinoButton(
-        padding: EdgeInsets.zero,
-        onPressed: () => _showLogOutConfirmation(context),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              // 图标
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: CupertinoColors.systemRed.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-                child: Icon(
-                  CupertinoIcons.square_arrow_right,
-                  color: CupertinoColors.systemRed,
-                  size: 18,
-                ),
-              ),
-              SizedBox(width: 12),
-
-              // 文字
-              Expanded(
-                child: Text(
-                  'Log Out',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: CupertinoColors.systemRed,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showLogOutConfirmation(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: Text('Log Out'),
-        content: Text('Are you sure you want to log out of your account?'),
-        actions: [
-          CupertinoDialogAction(
-            child: Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: Text('Log Out'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              _performLogOut(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _performLogOut(BuildContext context) {
-    // 这里可以添加实际的登出逻辑
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: Text('Logged Out'),
-        content: Text('You have been successfully logged out.'),
-        actions: [
-          CupertinoDialogAction(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
       ),
     );
   }
