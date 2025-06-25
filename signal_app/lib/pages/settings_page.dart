@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'profile_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -120,108 +120,112 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildUserProfileCard(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? CupertinoColors.systemGrey6.resolveFrom(context)
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: CupertinoColors.systemGrey5
-              .resolveFrom(context)
-              .withOpacity(0.3),
-          width: 0.5,
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: () => Navigator.of(
+        context,
+      ).push(CupertinoPageRoute(builder: (context) => ProfilePage())),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? CupertinoColors.systemGrey6.resolveFrom(context)
+              : CupertinoColors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: CupertinoColors.systemGrey5
+                .resolveFrom(context)
+                .withOpacity(0.3),
+            width: 0.5,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          // 头像
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color:
-                    MediaQuery.of(context).platformBrightness == Brightness.dark
-                    ? CupertinoColors.systemGrey4.resolveFrom(context)
-                    : CupertinoColors.systemGrey5.resolveFrom(context),
-                width: 2,
-              ),
-              gradient: LinearGradient(
-                colors: [
-                  CupertinoColors.systemBlue,
-                  CupertinoColors.systemPurple,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                'J',
-                style: TextStyle(
-                  color: CupertinoColors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
+        child: Row(
+          children: [
+            // 头像
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color:
+                      MediaQuery.of(context).platformBrightness ==
+                          Brightness.dark
+                      ? CupertinoColors.systemGrey4.resolveFrom(context)
+                      : CupertinoColors.systemGrey5.resolveFrom(context),
+                  width: 2,
+                ),
+                gradient: LinearGradient(
+                  colors: [
+                    CupertinoColors.systemBlue,
+                    CupertinoColors.systemPurple,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
-            ),
-          ),
-          SizedBox(width: 12),
-
-          // 用户信息
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Johan Ng',
+              child: Center(
+                child: Text(
+                  'J',
                   style: TextStyle(
-                    fontSize: 18,
+                    color: CupertinoColors.white,
+                    fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: CupertinoColors.label.resolveFrom(context),
-                    height: 1.2,
                   ),
                 ),
-                SizedBox(height: 0),
-                Text(
-                  '+1 (555) 123-4567',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                    height: 1.2,
-                  ),
-                ),
-                SizedBox(height: -1),
-                Text(
-                  '@johanng',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: CupertinoColors.systemBlue.resolveFrom(context),
-                    height: 1.2,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            SizedBox(width: 12),
 
-          // 进入按钮
-          CupertinoButton(
-            padding: EdgeInsets.zero,
-            minSize: 0,
-            child: Icon(
+            // 用户信息
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Johan Ng',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: CupertinoColors.label.resolveFrom(context),
+                      height: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: 0),
+                  Text(
+                    '+1 (555) 123-4567',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: CupertinoColors.secondaryLabel.resolveFrom(
+                        context,
+                      ),
+                      height: 1.2,
+                    ),
+                  ),
+                  SizedBox(height: -1),
+                  Text(
+                    '@johanng',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: CupertinoColors.systemBlue.resolveFrom(context),
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // 进入箭头
+            Icon(
               CupertinoIcons.chevron_right,
               color: CupertinoColors.systemGrey3.resolveFrom(context),
               size: 16,
             ),
-            onPressed: () => _showComingSoon(context, 'Profile'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
