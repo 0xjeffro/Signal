@@ -46,6 +46,13 @@ class _SettingsPageState extends State<SettingsPage> {
                       onTap: () => _showComingSoon(context, 'Wallet'),
                     ),
                     _SettingsItem(
+                      icon: CupertinoIcons.hammer,
+                      iconColor: CupertinoColors.systemPurple,
+                      title: 'Developer',
+                      subtitle: 'Create signals, Manage channels',
+                      onTap: () => _showComingSoon(context, 'Developer'),
+                    ),
+                    _SettingsItem(
                       icon: CupertinoIcons.chat_bubble_2,
                       iconColor: CupertinoColors.systemGreen,
                       title: 'Chats',
