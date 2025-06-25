@@ -52,16 +52,12 @@ class CustomTabBar extends StatelessWidget {
                 label: 'Inbox',
               ),
               BottomNavigationBarItem(
-                icon: SvgPicture.asset(
-                  'assets/icons/explore.svg',
-                  width: 22,
-                  height: 22,
-                  colorFilter: ColorFilter.mode(
-                    appState.selectedIndex == 1
-                        ? CupertinoColors.systemBlue.resolveFrom(context)
-                        : CupertinoColors.systemGrey.resolveFrom(context),
-                    BlendMode.srcIn,
-                  ),
+                icon: Icon(
+                  CupertinoIcons.compass_fill,
+                  size: 22,
+                  color: appState.selectedIndex == 1
+                      ? CupertinoColors.systemBlue.resolveFrom(context)
+                      : CupertinoColors.systemGrey.resolveFrom(context),
                 ),
                 label: 'Explore',
               ),

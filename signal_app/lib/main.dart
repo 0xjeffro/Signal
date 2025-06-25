@@ -121,14 +121,6 @@ class MyHomePage extends StatelessWidget {
     }
   }
 
-  Widget _buildExploreTab() {
-    return SafeArea(
-      child: Center(
-        child: Text('Explore will go here', style: TextStyle(fontSize: 18)),
-      ),
-    );
-  }
-
   String _getTitleForCurrentTab(int index) {
     switch (index) {
       case 0:
