@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import '../main.dart';
@@ -13,11 +14,40 @@ class LoginVerificationPage extends StatefulWidget {
 
 class _LoginVerificationPageState extends State<LoginVerificationPage> {
   final TextEditingController _codeController = TextEditingController();
+  final FocusNode _codeFocusNode = FocusNode();
   bool _isLoading = false;
+  Timer? _resendTimer;
+  int _resendCountdown = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // 页面加载时开始倒计时
+    _startResendCountdown();
+
+    // 确保焦点始终在验证码输入框
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _codeFocusNode.requestFocus();
+    });
+
+    // 监听焦点变化，确保键盘始终显示
+    _codeFocusNode.addListener(() {
+      if (!_codeFocusNode.hasFocus && !_isLoading) {
+        // 如果失去焦点且不在验证过程中，重新获取焦点
+        Future.delayed(Duration(milliseconds: 100), () {
+          if (mounted && !_isLoading) {
+            _codeFocusNode.requestFocus();
+          }
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
     _codeController.dispose();
+    _codeFocusNode.dispose();
+    _resendTimer?.cancel();
     super.dispose();
   }
 
@@ -31,8 +61,8 @@ class _LoginVerificationPageState extends State<LoginVerificationPage> {
           : Color(0xFFF2F2F7),
       child: GestureDetector(
         onTap: () {
-          // 点击空白区域收回键盘
-          FocusScope.of(context).unfocus();
+          // 点击空白区域确保焦点在验证码输入框
+          _codeFocusNode.requestFocus();
         },
         child: SafeArea(
           child: Column(
@@ -107,6 +137,7 @@ class _LoginVerificationPageState extends State<LoginVerificationPage> {
                         ),
                         child: CupertinoTextField(
                           controller: _codeController,
+                          focusNode: _codeFocusNode,
                           placeholder: '123456',
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
@@ -131,7 +162,10 @@ class _LoginVerificationPageState extends State<LoginVerificationPage> {
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(6),
                           ],
-                          autofocus: true,
+                          onTap: () {
+                            // 确保点击输入框时焦点在这里
+                            _codeFocusNode.requestFocus();
+                          },
                         ),
                       ),
 
@@ -141,14 +175,24 @@ class _LoginVerificationPageState extends State<LoginVerificationPage> {
                       Center(
                         child: CupertinoButton(
                           padding: EdgeInsets.zero,
-                          onPressed: () => _resendCode(),
+                          onPressed: _resendCountdown == 0
+                              ? () => _resendCode()
+                              : null,
                           child: Text(
-                            'Resend code',
+                            _resendCountdown == 0
+                                ? 'Resend code'
+                                : 'Resend code (${_resendCountdown.toString().padLeft(2, '0')}s)',
                             style: TextStyle(
-                              fontSize: 15,
-                              color: CupertinoColors.systemBlue.resolveFrom(
-                                context,
-                              ),
+                              fontSize: 14,
+                              fontFamily: 'Courier', // 使用等宽字体
+                              letterSpacing: -0.3, // 稍微紧凑一些
+                              color: _resendCountdown == 0
+                                  ? CupertinoColors.systemBlue.resolveFrom(
+                                      context,
+                                    )
+                                  : CupertinoColors.systemGrey.resolveFrom(
+                                      context,
+                                    ),
                             ),
                           ),
                         ),
@@ -208,8 +252,27 @@ class _LoginVerificationPageState extends State<LoginVerificationPage> {
     return _codeController.text.trim().length == 6;
   }
 
+  void _startResendCountdown() {
+    setState(() {
+      _resendCountdown = 60; // 60秒倒计时
+    });
+
+    _resendTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_resendCountdown > 0) {
+          _resendCountdown--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
   void _resendCode() {
     HapticFeedback.lightImpact();
+
+    // 重新开始倒计时
+    _startResendCountdown();
 
     showCupertinoDialog(
       context: context,
@@ -241,11 +304,20 @@ class _LoginVerificationPageState extends State<LoginVerificationPage> {
       await Future.delayed(Duration(seconds: 1));
 
       if (mounted) {
-        // 验证成功，跳转到主页面
-        Navigator.of(context).pushAndRemoveUntil(
-          CupertinoPageRoute(builder: (context) => MyApp()),
-          (route) => false,
-        );
+        // 先收起键盘
+        _codeFocusNode.unfocus();
+        FocusScope.of(context).unfocus();
+
+        // 等待键盘收起动画完成后再跳转
+        await Future.delayed(Duration(milliseconds: 300));
+
+        if (mounted) {
+          // 验证成功，跳转到主页面
+          Navigator.of(context).pushAndRemoveUntil(
+            CupertinoPageRoute(builder: (context) => MyApp()),
+            (route) => false,
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

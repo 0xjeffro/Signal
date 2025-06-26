@@ -786,6 +786,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
                                 _selectedCountryFlag,
@@ -795,20 +796,21 @@ class _LoginPageState extends State<LoginPage> {
                               Text(
                                 _selectedCountryCode,
                                 style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                   color: CupertinoColors.label.resolveFrom(
                                     context,
                                   ),
+                                  height: 1.0,
                                 ),
                               ),
-                              SizedBox(width: 4),
+                              SizedBox(width: 6),
                               Icon(
                                 CupertinoIcons.chevron_down,
                                 color: CupertinoColors.systemGrey.resolveFrom(
                                   context,
                                 ),
-                                size: 14,
+                                size: 13,
                               ),
                             ],
                           ),
