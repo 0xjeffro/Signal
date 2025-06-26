@@ -196,7 +196,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       height: 1.2,
                     ),
                   ),
-                  SizedBox(height: 0),
+                  SizedBox(height: 2),
                   Text(
                     '+1 (555) 123-4567',
                     style: TextStyle(
@@ -208,7 +208,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       height: 1.2,
                     ),
                   ),
-                  SizedBox(height: -1),
+                  SizedBox(height: 1),
                   Text(
                     '@johanng',
                     style: TextStyle(

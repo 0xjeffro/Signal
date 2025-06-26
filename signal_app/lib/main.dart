@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'widgets/draggable_bottom_sheet.dart';
 import 'widgets/custom_tab_bar.dart';
@@ -19,6 +20,12 @@ class MyApp extends StatelessWidget {
       create: (context) => MyAppState(),
       child: CupertinoApp(
         theme: CupertinoThemeData(primaryColor: CupertinoColors.systemBlue),
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [Locale('en', 'US'), Locale('zh', 'CN')],
         home: MyHomePage(),
       ),
     );

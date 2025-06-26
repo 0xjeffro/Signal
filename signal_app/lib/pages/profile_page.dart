@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,11 +9,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _firstNameController = TextEditingController(
-    text: 'Johan',
-  );
-  final TextEditingController _lastNameController = TextEditingController(
-    text: 'Ng',
+  final TextEditingController _nickNameController = TextEditingController(
+    text: 'Johan Ng',
   );
   final TextEditingController _usernameController = TextEditingController(
     text: '@johanng',
@@ -24,8 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    _nickNameController.dispose();
     _usernameController.dispose();
     _emailController.dispose();
     super.dispose();
@@ -58,31 +54,37 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: 40),
+        child: GestureDetector(
+          onTap: () {
+            // 点击空白区域收回键盘
+            FocusScope.of(context).unfocus();
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 40),
 
-              // 头像
-              _buildAvatar(),
+                // 头像
+                _buildAvatar(),
 
-              SizedBox(height: 40),
+                SizedBox(height: 40),
 
-              // 姓名组
-              _buildNameSection(),
+                // 姓名组
+                _buildNameSection(),
 
-              SizedBox(height: 20),
+                SizedBox(height: 20),
 
-              // 联系信息组
-              _buildContactSection(),
+                // 联系信息组
+                _buildContactSection(),
 
-              SizedBox(height: 40),
+                SizedBox(height: 40),
 
-              // 登出按钮
-              _buildLogOutButton(),
+                // 登出按钮
+                _buildLogOutButton(),
 
-              SizedBox(height: 40),
-            ],
+                SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
@@ -141,18 +143,9 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Column(
         children: [
           _buildTextFieldItem(
-            controller: _firstNameController,
-            label: 'First Name',
+            controller: _nickNameController,
+            label: 'Nick Name',
             isFirst: true,
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 16),
-            height: 0.5,
-            color: CupertinoColors.systemGrey4.resolveFrom(context),
-          ),
-          _buildTextFieldItem(
-            controller: _lastNameController,
-            label: 'Last Name',
             isLast: true,
           ),
         ],
@@ -214,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> {
     bool isLast = false,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           SizedBox(
@@ -231,17 +224,32 @@ class _ProfilePageState extends State<ProfilePage> {
           Expanded(
             child: CupertinoTextField(
               controller: controller,
-              decoration: BoxDecoration(),
+              decoration: null,
+              padding: EdgeInsets.zero,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
                 color: CupertinoColors.label.resolveFrom(context),
               ),
-              placeholder: 'Enter $label',
+              placeholder: 'Tap to edit',
               placeholderStyle: TextStyle(
                 color: CupertinoColors.systemGrey3.resolveFrom(context),
+                fontSize: 15,
               ),
+              textAlign: TextAlign.right,
+              clearButtonMode: OverlayVisibilityMode.editing,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (value) {
+                // 点击键盘上的完成按钮收回键盘
+                FocusScope.of(context).unfocus();
+              },
             ),
+          ),
+          SizedBox(width: 4),
+          Icon(
+            CupertinoIcons.pencil,
+            color: CupertinoColors.systemGrey3.resolveFrom(context),
+            size: 16,
           ),
         ],
       ),
@@ -390,9 +398,12 @@ class _ProfilePageState extends State<ProfilePage> {
             isDestructiveAction: true,
             child: Text('Log Out'),
             onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // 返回到settings页面
-              _showComingSoon('Log Out');
+              Navigator.of(context).pop(); // 关闭确认对话框
+              // 跳转到登录页面，并清除所有之前的页面栈
+              Navigator.of(context).pushAndRemoveUntil(
+                CupertinoPageRoute(builder: (context) => LoginPage()),
+                (route) => false,
+              );
             },
           ),
         ],
