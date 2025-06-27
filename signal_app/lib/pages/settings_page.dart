@@ -53,11 +53,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       onTap: () => _showComingSoon(context, 'Developer'),
                     ),
                     _SettingsItem(
-                      icon: CupertinoIcons.chat_bubble_2,
+                      icon: CupertinoIcons.link,
                       iconColor: CupertinoColors.systemGreen,
-                      title: 'Chats',
-                      subtitle: 'Theme, Wallpapers, Chat history',
-                      onTap: () => _showComingSoon(context, 'Chats'),
+                      title: 'Social Media',
+                      subtitle: 'Twitter, Discord, Telegram integration',
+                      onTap: () => _showComingSoon(context, 'Social Media'),
                     ),
                     _SettingsItem(
                       icon: CupertinoIcons.bell,
@@ -114,7 +114,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ],
                 ),
 
-                SizedBox(height: 120), // 为bottom sheet留空间
+                SizedBox(height: 32), // 底部间距
               ],
             ),
           ),
@@ -190,29 +190,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   Text(
                     'Johan Ng',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 19,
                       fontWeight: FontWeight.w600,
                       color: CupertinoColors.label.resolveFrom(context),
                       height: 1.2,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: 3),
                   Text(
                     '+1 (555) 123-4567',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: FontWeight.w400,
                       color: CupertinoColors.secondaryLabel.resolveFrom(
                         context,
                       ),
-                      height: 1.2,
+                      height: 1.3,
                     ),
                   ),
                   SizedBox(height: 1),
                   Text(
                     '@johanng',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: CupertinoColors.systemBlue.resolveFrom(context),
                       height: 1.2,
@@ -273,7 +273,7 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: EdgeInsets.zero,
       onPressed: item.onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.all(16),
         child: Row(
           children: [
             // 图标
@@ -297,19 +297,23 @@ class _SettingsPageState extends State<SettingsPage> {
                     item.title,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.w500,
                       color: CupertinoColors.label.resolveFrom(context),
+                      height: 1.2,
                     ),
                   ),
                   if (item.subtitle != null) ...[
-                    SizedBox(height: 1),
+                    SizedBox(height: 2),
                     Text(
                       item.subtitle!,
                       style: TextStyle(
                         fontSize: 13,
+                        fontWeight: FontWeight.w400,
                         color: CupertinoColors.secondaryLabel.resolveFrom(
                           context,
                         ),
+                        height: 1.3,
+                        letterSpacing: -0.2,
                       ),
                     ),
                   ],

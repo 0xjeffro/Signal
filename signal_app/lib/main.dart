@@ -122,15 +122,17 @@ class MyHomePage extends StatelessWidget {
         children: [
           // 让背景内容延伸到底部，为毛玻璃效果提供背景
           Positioned.fill(child: _buildBody(appState)),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: DraggableBottomSheet(
-              appState: appState,
-              title: _getTitleForCurrentTab(appState.selectedIndex),
+          // 只在Inbox和Explore页面显示底部sheet
+          if (appState.selectedIndex == 0 || appState.selectedIndex == 1)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: DraggableBottomSheet(
+                appState: appState,
+                title: _getTitleForCurrentTab(appState.selectedIndex),
+              ),
             ),
-          ),
         ],
       ),
       bottomNavigationBar: CustomTabBar(),
