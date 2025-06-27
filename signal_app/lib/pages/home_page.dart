@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../widgets/custom_refresh_control.dart';
-import '../widgets/message_card.dart';
+import '../widgets/enhanced_signal_card.dart';
 
 class HomePage extends StatefulWidget {
   final MyAppState appState;
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   void _loadInitialData() {
     _allMessages = List.generate(
       _pageSize,
-      (index) => _generateFakeMessage(index),
+      (index) => _generateFlexibleSignal(index),
     );
     _currentPage = 1;
     _hasMoreData = true;
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
     // 生成新的消息数据
     final newMessages = List.generate(
       _pageSize,
-      (index) => _generateFakeMessage(_allMessages.length + index),
+      (index) => _generateFlexibleSignal(_allMessages.length + index),
     );
 
     setState(() {
@@ -131,73 +131,387 @@ class _HomePageState extends State<HomePage> {
     await _handleRefresh();
   }
 
-  // 生成假消息数据
-  Map<String, dynamic> _generateFakeMessage(int index) {
-    final List<String> titles = [
-      'iOS 17 新特性发布',
-      'Flutter 3.16 更新详情',
-      '苹果开发者大会 WWDC 2024',
-      'SwiftUI 最佳实践分享',
-      'Dart 3.0 语言特性解析',
-      '移动开发趋势分析',
-      'Xcode 15 性能优化',
-      'App Store 审核指南更新',
-      'iOS 设计规范 2024',
-      'Flutter Web 生产环境实践',
-    ];
-
-    final List<String> contents = [
-      '苹果公司在今年的开发者大会上发布了iOS 17的重要更新，包含了全新的交互式小组件、改进的锁屏体验，以及更强大的机器学习框架。开发者现在可以利用这些新功能为用户创建更加个性化和智能的应用体验，特别是在小组件的交互性和实时数据展示方面有了显著的提升。',
-      'Flutter团队发布了3.16版本的重大更新。',
-      'WWDC 2024将于6月举行，预计将发布iOS 18、macOS 15等重要系统更新，以及全新的开发工具和框架。此次大会将重点关注人工智能集成、增强现实技术的进步，以及开发者工具链的全面升级。苹果还将展示新的编程语言特性和框架改进，帮助开发者构建更高效、更具创新性的应用程序。',
-      '本文深入探讨了SwiftUI的最佳实践，包括状态管理、性能优化、以及如何构建可复用的UI组件。通过实际案例分析，我们将学习如何有效地组织代码结构，避免常见的性能陷阱。',
-      'Dart 3.0带来了许多激动人心的新特性。',
-      '移动开发领域正在经历快速变化，跨平台框架、AI集成、以及新的用户界面设计模式正在重塑行业格局。开发者需要不断学习新技术，适应用户需求的变化，同时保持代码的可维护性和应用的性能表现。未来几年，我们将看到更多基于机器学习的开发工具和自动化解决方案的出现。',
-      'Xcode 15引入了多项性能优化。',
-      'App Store审核指南进行了重要更新，涉及隐私保护、内容审核标准，以及新的提交流程要求。开发者需要特别注意用户数据的处理方式，确保应用符合最新的隐私规范。同时，新的审核流程将更加注重应用的质量和用户体验，要求开发者提供更详细的应用说明和测试用例。',
-      '苹果发布了2024年的iOS设计规范更新。',
-      'Flutter Web在生产环境中的应用越来越广泛，本文分享了性能优化、SEO优化，以及部署的最佳实践。我们将详细讨论如何解决Flutter Web应用中常见的性能问题，包括包大小优化、首屏加载时间减少，以及搜索引擎优化策略。通过这些技术手段，Flutter Web应用可以达到与原生Web应用相当的用户体验。',
-    ];
-
-    final List<String> channels = [
-      'iOS开发频道',
-      'Flutter社区',
-      'Apple Developer',
-      'SwiftUI精选',
-      'Dart语言',
-      '移动开发者',
-      'Xcode技巧',
-      'App Store指南',
-      '设计规范',
-      'Flutter实战',
-    ];
-
-    final List<Color> channelColors = [
-      CupertinoColors.systemBlue,
-      CupertinoColors.systemGreen,
-      CupertinoColors.systemOrange,
-      CupertinoColors.systemPurple,
-      CupertinoColors.systemRed,
-      CupertinoColors.systemTeal,
-      CupertinoColors.systemIndigo,
-      CupertinoColors.systemPink,
-      CupertinoColors.systemYellow,
-      CupertinoColors.systemCyan,
-    ];
-
-    // 生成时间（最近7天内的随机时间）
+  // 生成灵活的信号数据（巨鲸交易、KOL喊单、新闻等）
+  Map<String, dynamic> _generateFlexibleSignal(int index) {
     final now = DateTime.now();
-    final randomHours = (index * 3 + 2) % 168; // 最近7天
-    final messageTime = now.subtract(Duration(hours: randomHours));
+    final randomHours = (index * 2 + 1) % 48;
+    final signalTime = now.subtract(Duration(hours: randomHours));
+
+    // 30% 巨鲸交易信号
+    if (index % 10 < 3) {
+      return _generateWhaleSignal(index, signalTime);
+    }
+    // 25% KOL喊单信号
+    else if (index % 10 < 5) {
+      return _generateKOLSignal(index, signalTime);
+    }
+    // 25% 链上DCA信号
+    else if (index % 10 < 7) {
+      return _generateDCASignal(index, signalTime);
+    }
+    // 20% 新闻/分析信号
+    else {
+      return _generateNewsSignal(index, signalTime);
+    }
+  }
+
+  // 生成巨鲸交易信号
+  Map<String, dynamic> _generateWhaleSignal(int index, DateTime time) {
+    final whales = ['0x7f...a9e2', '0x1a...b8c4', '0x2d...f3a1'];
+    final pairs = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT'];
+    final sides = ['LONG', 'SHORT'];
+
+    final signal = {
+      'channel': whales[index % whales.length],
+      'channelColor': CupertinoColors.systemBlue,
+      'channelIcon': CupertinoIcons.graph_circle_fill,
+      // 1. 大标题（必有）
+      'title': pairs[index % pairs.length],
+      // 2. 副标题（可选）
+      'subtitle': '${sides[index % sides.length]} Position',
+      // 3. 正文描述（这里省略，主要靠数据列表展示）
+      // 4. 正文数据列表（可选，但与描述至少有一个）
+      'customData': {
+        'Entry':
+            '\$${(45000.0 + (index * 1234.56) % 20000).toStringAsFixed(2)}',
+        'Size': '\$${_formatAmount(100000.0 + (index * 50000))}',
+        'Leverage': '${(3.0 + (index % 7)).toStringAsFixed(0)}x',
+        'Side': sides[index % sides.length],
+      },
+      'time': time,
+      'followers': 156 + (index * 23),
+      'updates': <Map<String, dynamic>>[],
+    };
+
+    // 添加follow-up更新 - 增加更多更新以测试折叠/展开功能
+    if (index % 3 == 0) {
+      final updates = <Map<String, dynamic>>[];
+
+      // 第一个更新：开仓
+      updates.add({
+        'title': 'Position Opened',
+        'description': 'Initial position established',
+        'time': time.add(Duration(minutes: 30)),
+        'icon': CupertinoIcons.add_circled,
+        'color': CupertinoColors.systemBlue,
+        'data': {'Entry': '\$45,120', 'Size': '\$100K'},
+      });
+
+      // 第二个更新：加仓（如果满足条件）
+      if (index % 5 == 0) {
+        updates.add({
+          'title': 'Position Added',
+          'description': 'Increased position size',
+          'time': time.add(Duration(hours: 2)),
+          'icon': CupertinoIcons.plus_circle,
+          'color': CupertinoColors.systemGreen,
+          'data': {'Amount': '\$25K', 'Price': '\$46,200'},
+        });
+      }
+
+      // 第三个更新：调整止损
+      if (index % 4 == 0) {
+        updates.add({
+          'title': 'Stop Loss Updated',
+          'description': 'Adjusted risk management level',
+          'time': time.add(Duration(hours: 4)),
+          'icon': CupertinoIcons.shield,
+          'color': CupertinoColors.systemOrange,
+          'data': {'New SL': '\$44,500'},
+        });
+      }
+
+      // 第四个更新：部分止盈/止损
+      if (index % 7 == 0) {
+        final isProfit = index % 2 == 0;
+        updates.add({
+          'title': isProfit ? 'Take Profit' : 'Stop Loss Hit',
+          'description': isProfit
+              ? 'Partial profit taking'
+              : 'Risk management triggered',
+          'time': time.add(Duration(hours: 6)),
+          'icon': isProfit
+              ? CupertinoIcons.checkmark_circle
+              : CupertinoIcons.xmark_circle,
+          'color': isProfit
+              ? CupertinoColors.systemGreen
+              : CupertinoColors.systemRed,
+          'data': {'PnL': isProfit ? '+\$2,500' : '-\$1,234', 'Size': '50%'},
+        });
+      }
+
+      // 第五个更新：最终平仓（仅特定条件）
+      if (index % 11 == 0) {
+        updates.add({
+          'title': 'Position Closed',
+          'description': 'Full position closed successfully',
+          'time': time.add(Duration(hours: 12)),
+          'icon': CupertinoIcons.checkmark_circle_fill,
+          'color': CupertinoColors.systemGreen,
+          'data': {'Final PnL': '+\$4,567', 'ROI': '+4.5%'},
+        });
+      }
+
+      signal['updates'] = updates;
+    }
+
+    return signal;
+  }
+
+  // 生成KOL喊单信号
+  Map<String, dynamic> _generateKOLSignal(int index, DateTime time) {
+    final kols = ['CryptoKing', 'BlockchainBull', 'AltcoinAlpha'];
+    final calls = ['BUY SIGNAL', 'SELL ALERT', 'ACCUMULATE'];
 
     return {
+      'channel': kols[index % kols.length],
+      'channelColor': CupertinoColors.systemPurple,
+      'channelIcon': CupertinoIcons.star_fill,
+      // 1. 大标题（必有）
+      'title': calls[index % calls.length],
+      // 2. 副标题（可选）
+      'subtitle': 'ETH/USDT Analysis',
+      // 3. 正文描述（这里有描述）
+      'content':
+          'Technical analysis shows strong bullish momentum. Key resistance at \$2,800 broken.',
+      // 4. 正文数据列表（KOL信号可选，主要靠描述）
+      'customData': {
+        'Entry Target': '\$2,750',
+        'Stop Loss': '\$2,650',
+        'Take Profit': '\$3,200',
+        'Risk/Reward': '1:4.5',
+      },
+      'time': time,
+      'views': 1200 + (index * 150),
+      'updates': _generateKOLUpdates(index, time),
+    };
+  }
+
+  // 为KOL信号生成follow-up更新
+  List<Map<String, dynamic>> _generateKOLUpdates(int index, DateTime time) {
+    if (index % 4 != 0) return [];
+
+    final updates = <Map<String, dynamic>>[];
+
+    // 第一个更新：确认信号
+    updates.add({
+      'title': 'Signal Confirmed',
+      'description': 'Additional technical indicators align',
+      'time': time.add(Duration(hours: 1)),
+      'icon': CupertinoIcons.checkmark_alt,
+      'color': CupertinoColors.systemBlue,
+    });
+
+    // 第二个更新：目标达成
+    if (index % 8 == 0) {
+      updates.add({
+        'title': 'Target Hit',
+        'description': 'First target reached as predicted',
+        'time': time.add(Duration(hours: 4)),
+        'icon': CupertinoIcons.checkmark_circle,
+        'color': CupertinoColors.systemGreen,
+        'data': {'Target 1': '\$2,850', 'Gain': '+3.2%'},
+      });
+    }
+
+    // 第三个更新：调整分析
+    if (index % 12 == 0) {
+      updates.add({
+        'title': 'Analysis Update',
+        'description': 'Market conditions changed, strategy adjusted',
+        'time': time.add(Duration(hours: 8)),
+        'icon': CupertinoIcons.refresh,
+        'color': CupertinoColors.systemOrange,
+        'data': {'New Target': '\$2,950'},
+      });
+    }
+
+    // 第四个更新：最终结果
+    if (index % 16 == 0) {
+      final success = index % 2 == 0;
+      updates.add({
+        'title': success ? 'Final Target Hit' : 'Signal Invalidated',
+        'description': success
+            ? 'All targets reached successfully'
+            : 'Market conditions no longer favorable',
+        'time': time.add(Duration(hours: 24)),
+        'icon': success
+            ? CupertinoIcons.star_fill
+            : CupertinoIcons.xmark_octagon,
+        'color': success
+            ? CupertinoColors.systemGreen
+            : CupertinoColors.systemRed,
+        'data': success
+            ? {'Total Gain': '+8.5%', 'Rating': '5★'}
+            : {'Loss': '-2.1%'},
+      });
+    }
+
+    return updates;
+  }
+
+  // 格式化金额显示
+  String _formatAmount(double amount) {
+    if (amount >= 1000000) {
+      return '${(amount / 1000000).toStringAsFixed(1)}M';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(1)}K';
+    } else {
+      return amount.toStringAsFixed(0);
+    }
+  }
+
+  // 生成链上DCA信号
+  Map<String, dynamic> _generateDCASignal(int index, DateTime time) {
+    final fromTokens = ['WBTC', 'ETH', 'USDC', 'WETH', 'DAI'];
+    final toTokens = [
+      'Fartcoin',
+      'PEPE',
+      'SHIB',
+      'DOGE',
+      'BONK',
+      'WIF',
+      'POPCAT',
+    ];
+    final prices = [55689.08, 3245.67, 1.0, 3234.89, 1.0];
+
+    final fromToken = fromTokens[index % fromTokens.length];
+    final toToken = toTokens[index % toTokens.length];
+    final price = prices[index % prices.length];
+
+    // 生成DCA参数
+    final swapAmount = (5000 + (index * 1234.5) % 15000).toStringAsFixed(2);
+    final swapInterval = [15, 30, 60, 120, 300][index % 5]; // seconds
+    final duration = [1, 3, 5, 10, 15][index % 5]; // minutes
+
+    // 生成流动性和市值数据
+    final liq = (10000 + (index * 5678.9) % 50000).toStringAsFixed(2);
+    final mc = (500000 + (index * 12345.6) % 1000000).toStringAsFixed(2);
+    final ratio = ((double.parse(liq) / double.parse(mc)) * 100)
+        .toStringAsFixed(2);
+
+    // 生成买入比例
+    final buyLiq = (0.1 + (index * 0.05) % 0.5).toStringAsFixed(2);
+    final buyMC = (0.005 + (index * 0.002) % 0.02).toStringAsFixed(3);
+
+    return {
+      'channel': 'DCA Bot',
+      'channelColor': CupertinoColors.systemTeal,
+      'channelIcon': CupertinoIcons.arrow_2_circlepath,
+      // 1. 大标题（必有）
+      'title': '$fromToken ➜ $toToken',
+      // 2. 副标题（可选）
+      'subtitle': '\$${price.toStringAsFixed(2)}',
+      // 3. 正文描述（这里有简化的描述）
+      'content':
+          'Swap \$${swapAmount}/${swapInterval}s for ${duration}min, Buy/Liq: ${buyLiq}%, Buy/MC: ${buyMC}%',
+      // 4. 正文数据列表（DCA的关键数据）
+      'customData': {
+        'Amount': '\$${swapAmount}',
+        'Interval': '${swapInterval}s',
+        'Duration': '${duration}min',
+        'Liquidity': '\$${liq}K',
+        'Market Cap': '\$${mc}K',
+        'Liq Ratio': '${ratio}%',
+      },
+      'time': time,
+      'followers': 89 + (index * 15),
+      'updates': _generateDCAUpdates(index, time),
+    };
+  }
+
+  // 为DCA信号生成follow-up更新
+  List<Map<String, dynamic>> _generateDCAUpdates(int index, DateTime time) {
+    if (index % 5 != 0) return [];
+
+    final updates = <Map<String, dynamic>>[];
+
+    // 第一个更新：DCA开始
+    updates.add({
+      'title': 'DCA Started',
+      'description': 'Automated buying sequence initiated',
+      'time': time.add(Duration(minutes: 2)),
+      'icon': CupertinoIcons.play_circle,
+      'color': CupertinoColors.systemGreen,
+      'data': {'Status': 'Active', 'Progress': '0%'},
+    });
+
+    // 第二个更新：进度更新
+    if (index % 10 == 0) {
+      updates.add({
+        'title': 'DCA Progress',
+        'description': 'Partial execution completed',
+        'time': time.add(Duration(minutes: 8)),
+        'icon': CupertinoIcons.clock,
+        'color': CupertinoColors.systemBlue,
+        'data': {'Progress': '40%', 'Avg Price': '\$0.00234'},
+      });
+    }
+
+    // 第三个更新：价格异常
+    if (index % 15 == 0) {
+      updates.add({
+        'title': 'Price Alert',
+        'description': 'Significant price movement detected',
+        'time': time.add(Duration(minutes: 12)),
+        'icon': CupertinoIcons.exclamationmark_triangle,
+        'color': CupertinoColors.systemOrange,
+        'data': {'Price Change': '+15.6%', 'Action': 'Continued'},
+      });
+    }
+
+    // 第四个更新：DCA完成
+    if (index % 20 == 0) {
+      final success = index % 4 != 0;
+      updates.add({
+        'title': success ? 'DCA Completed' : 'DCA Stopped',
+        'description': success
+            ? 'All scheduled purchases executed'
+            : 'Stopped due to market conditions',
+        'time': time.add(Duration(minutes: 20)),
+        'icon': success
+            ? CupertinoIcons.checkmark_circle_fill
+            : CupertinoIcons.stop_circle,
+        'color': success
+            ? CupertinoColors.systemGreen
+            : CupertinoColors.systemRed,
+        'data': success
+            ? {
+                'Total Spent': '\$9,281',
+                'Avg Price': '\$0.00198',
+                'Tokens': '4.69M',
+              }
+            : {'Spent': '\$4,640', 'Reason': 'High Slippage'},
+      });
+    }
+
+    return updates;
+  }
+
+  // 生成新闻/分析信号
+  Map<String, dynamic> _generateNewsSignal(int index, DateTime time) {
+    final sources = ['CoinDesk', 'CryptoNews', 'BlockBeats'];
+    final titles = [
+      'Bitcoin ETF Approval Imminent',
+      'Ethereum 2.0 Staking Reaches New High',
+      'Major Exchange Lists New Altcoin',
+    ];
+
+    return {
+      'channel': sources[index % sources.length],
+      'channelColor': CupertinoColors.systemOrange,
+      'channelIcon': CupertinoIcons.news,
+      // 1. 大标题（必有）
       'title': titles[index % titles.length],
-      'content': contents[index % contents.length],
-      'channel': channels[index % channels.length],
-      'channelColor': channelColors[index % channelColors.length],
-      'time': messageTime,
-      'views': (index + 1) * 1234 + (index * 567),
-      'maxLines': 2 + (index % 5), // 2-6行随机
+      // 2. 副标题（可选 - 新闻信号通常不需要）
+      // 3. 正文描述（新闻信号主要靠描述，不需要数据列表）
+      'content':
+          'Market analysis suggests significant price movement incoming based on fundamental developments.',
+      // 4. 正文数据列表（新闻信号通常不需要）
+      'time': time,
+      'views': 5000 + (index * 200),
+      'maxLines': 2,
+      'updates': [],
     };
   }
 
@@ -381,6 +695,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // 构建统一的增强信号卡片
+  Widget _buildMessageItem(Map<String, dynamic> signal) {
+    return EnhancedSignalCard(
+      signal: signal,
+      onTap: () {
+        // 点击查看信号详情
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -457,14 +781,10 @@ class _HomePageState extends State<HomePage> {
               final filteredMessages = _getFilteredMessages();
               if (index >= filteredMessages.length) return null;
               final message = filteredMessages[index];
+
               return Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: MessageCard(
-                  message: message,
-                  onTap: () {
-                    // 点击查看详情
-                  },
-                ),
+                child: _buildMessageItem(message),
               );
             }, childCount: _getFilteredMessages().length),
           ),

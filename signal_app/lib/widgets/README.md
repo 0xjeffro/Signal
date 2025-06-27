@@ -1,141 +1,128 @@
 # Widgets 组件库
 
-这里包含了可复用的UI组件，所有组件都采用iOS风格设计。
+这个目录包含了 Signal 应用中使用的自定义组件。
 
-## MessageCard 消息卡片组件
+## 组件列表
 
-一个用于显示消息内容的卡片组件，支持频道标签、时间、内容和观看数等信息显示。
+### 📱 页面组件
 
-### 基本用法
+#### `custom_tab_bar.dart`
+- **功能**: 自定义iOS风格底部标签栏
+- **特性**: 支持图标、文字、选中状态动画
+- **使用场景**: 应用主要导航界面
 
+#### `draggable_bottom_sheet.dart`
+- **功能**: 可拖拽的底部面板组件
+- **特性**: 支持手势拖拽、自动吸附、平滑动画
+- **使用场景**: 弹出式内容展示
+
+#### `custom_refresh_control.dart`
+- **功能**: 自定义下拉刷新控件
+- **特性**: iOS风格设计、自定义动画效果
+- **使用场景**: 列表页面的下拉刷新功能
+
+### 🎯 信号展示组件
+
+#### `enhanced_signal_card.dart` ⭐ 核心组件
+- **功能**: 统一的增强信号卡片，支持所有类型的信号展示
+- **适用信号类型**:
+  - 🐋 巨鲸交易信号
+  - 👑 KOL喊单信号  
+  - 📰 新闻/分析信号
+  - 🔔 自定义信号类型
+
+**特性**:
+- **完全灵活的数据结构**: 信号开发者可以自定义任意字段和内容
+- **Follow-up更新系统**: 支持信号的后续跟进和更新展示
+- **智能渲染**: 根据数据类型自动优化显示效果
+- **可展开/收起**: 超过2个更新时支持展开查看全部
+- **iOS风格设计**: 完美适配系统暗黑模式
+
+**数据结构**:
 ```dart
-import '../widgets/message_card.dart';
+// 基础信号数据
+{
+  'channel': '信号来源',          // 必需
+  'channelColor': Color,         // 可选：频道颜色
+  'channelIcon': IconData,       // 可选：频道图标
+  'title': '信号标题',           // 必需
+  'subtitle': '副标题',          // 可选
+  'content': '详细内容',         // 可选
+  'time': DateTime,              // 必需：信号时间
+  'views': int,                  // 可选：观看数
+  'followers': int,              // 可选：跟单数
+  'customData': Map,             // 可选：自定义数据展示
+  'updates': List,               // 可选：Follow-up更新列表
+}
 
-MessageCard(
-  message: {
-    'title': '消息标题',
-    'content': '消息内容描述...',
-    'channel': '频道名称',
-    'channelColor': CupertinoColors.systemBlue,
-    'time': DateTime.now(),
-    'views': 1234,
-    'maxLines': 3,
-  },
-  onTap: () {
-    // 点击卡片的处理逻辑
-  },
-)
-```
-
-### 参数说明
-
-| 参数      | 类型                   | 说明           |
-| --------- | ---------------------- | -------------- |
-| `message` | `Map<String, dynamic>` | 消息数据对象   |
-| `onTap`   | `VoidCallback?`        | 可选的点击回调 |
-
-#### message 数据结构
-
-| 字段           | 类型       | 说明             |
-| -------------- | ---------- | ---------------- |
-| `title`        | `String`   | 消息标题         |
-| `content`      | `String`   | 消息内容         |
-| `channel`      | `String`   | 频道名称         |
-| `channelColor` | `Color`    | 频道标签颜色     |
-| `time`         | `DateTime` | 消息时间         |
-| `views`        | `int`      | 观看次数         |
-| `maxLines`     | `int`      | 内容显示最大行数 |
-
-## CustomRefreshControl 下拉刷新组件
-
-这是一个可复用的iOS风格下拉刷新组件，具有精美的动画效果和触觉反馈。
-
-## 特性
-
-- ✅ iOS原生风格的下拉刷新动画
-- ✅ 向下箭头渐变显示和缩放效果
-- ✅ 触发时的弹性动画和颜色变化
-- ✅ 触觉反馈（HapticFeedback）
-- ✅ 完全可自定义的触发距离
-- ✅ 适配安全区域（刘海屏）
-
-## 基本用法
-
-```dart
-import '../widgets/custom_refresh_control.dart';
-
-// 在CustomScrollView中使用
-CustomScrollView(
-  slivers: [
-    // 添加下拉刷新组件
-    CustomRefreshControl(
-      onRefresh: _handleRefresh,
-    ),
-
-    // 其他Sliver组件...
-    CupertinoSliverNavigationBar(
-      largeTitle: Text('页面标题'),
-    ),
-
-    SliverList(...),
-  ],
-)
-
-// 刷新处理函数
-Future<void> _handleRefresh() async {
-  // 执行刷新逻辑（网络请求等）
-  await Future.delayed(Duration(seconds: 1));
-
-  // 更新UI状态
-  setState(() {
-    // 更新数据
-  });
+// Follow-up更新数据
+{
+  'title': '更新标题',
+  'description': '更新描述',
+  'time': DateTime,
+  'icon': IconData,              // 可选：更新图标
+  'color': Color,                // 可选：更新颜色
+  'data': Map,                   // 可选：额外数据
 }
 ```
 
-## 自定义参数
-
+**使用示例**:
 ```dart
-CustomRefreshControl(
-  onRefresh: _handleRefresh,
-  refreshTriggerPullDistance: 70.0,  // 触发刷新的下拉距离（默认60.0）
-  refreshIndicatorExtent: 70.0,     // 刷新指示器的显示高度（默认60.0）
+EnhancedSignalCard(
+  signal: {
+    'channel': '0x7f...a9e2',
+    'channelColor': CupertinoColors.systemBlue,
+    'title': 'BTC/USDT',
+    'subtitle': 'LONG Position',
+    'time': DateTime.now(),
+    'customData': {
+      'Entry': 45000.0,
+      'Size': 100000.0,
+      'Leverage': 5.0,
+      'Side': 'LONG',
+    },
+    'updates': [
+      {
+        'title': 'Position Added',
+        'description': 'Increased position size',
+        'time': DateTime.now(),
+        'data': {'Amount': '\$25K'},
+      }
+    ],
+  },
+  onTap: () => Navigator.push(...),
 )
 ```
 
-## 参数说明
+### 🔧 工具组件
 
-| 参数                         | 类型                      | 默认值 | 说明                     |
-| ---------------------------- | ------------------------- | ------ | ------------------------ |
-| `onRefresh`                  | `Future<void> Function()` | 必需   | 刷新时调用的异步函数     |
-| `refreshTriggerPullDistance` | `double`                  | 60.0   | 触发刷新需要的下拉距离   |
-| `refreshIndicatorExtent`     | `double`                  | 60.0   | 刷新指示器的显示区域高度 |
+所有组件都遵循以下设计原则：
+- ✅ iOS风格设计语言
+- ✅ 支持暗黑模式自动适配
+- ✅ 类型安全的Dart代码
+- ✅ 可复用和可配置
+- ✅ 性能优化
 
-## 动画效果
+## 设计系统
 
-### 下拉阶段
-- 向下箭头从透明逐渐显现
-- 图标大小从小到大动态变化
-- 整体缩放从0.7倍到1.0倍
+### 颜色规范
+- 使用 `CupertinoColors` 系统颜色
+- 支持自动暗黑模式切换
+- 语义化颜色命名
 
-### 触发阶段
-- 箭头颜色变为蓝色
-- 弹性缩放动画（1.0倍→1.2倍→1.0倍）
-- 中等强度触觉反馈
+### 字体规范
+- 标题：16pt, FontWeight.w600
+- 副标题：14pt, FontWeight.w500  
+- 正文：14pt, FontWeight.normal
+- 辅助文字：12pt
 
-### 刷新阶段
-- 显示标准的CupertinoActivityIndicator
-- 箭头消失，加载动画显示
+### 间距规范
+- 大间距：16pt
+- 中间距：12pt
+- 小间距：8pt
+- 微间距：4pt
 
-## 完整示例
-
-查看以下文件了解完整用法：
-- `lib/pages/home_page.dart` - 基础用法示例
-- `lib/pages/explore_page.dart` - 列表刷新示例
-
-## 注意事项
-
-1. 只能在 `CustomScrollView` 的 `slivers` 中使用
-2. 必须提供 `onRefresh` 回调函数
-3. 组件会自动处理刷新状态，无需手动管理
-4. 触觉反馈需要在真机上才能感受到效果
+### 圆角规范
+- 卡片圆角：12pt
+- 按钮圆角：8pt
+- 标签圆角：16pt
