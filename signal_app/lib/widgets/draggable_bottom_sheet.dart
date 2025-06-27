@@ -85,10 +85,10 @@ class _DraggableBottomSheetState extends State<DraggableBottomSheet>
                     MediaQuery.of(context).platformBrightness == Brightness.dark
                     ? CupertinoColors.systemGrey5
                           .resolveFrom(context)
-                          .withOpacity(0.65)
+                          .withOpacity(0.60)
                     : CupertinoColors.systemBackground
                           .resolveFrom(context)
-                          .withOpacity(0.65),
+                          .withOpacity(0.55),
                 // 移除边框，让与tabbar完全融合
               ),
               child: Column(
