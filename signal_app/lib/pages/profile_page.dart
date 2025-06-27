@@ -8,7 +8,8 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage>
+    with TickerProviderStateMixin {
   final TextEditingController _nickNameController = TextEditingController(
     text: 'Johan Ng',
   );
@@ -393,17 +394,42 @@ class _ProfilePageState extends State<ProfilePage> {
           CupertinoDialogAction(
             isDestructiveAction: true,
             child: Text('Log Out'),
-            onPressed: () {
-              Navigator.of(context).pop(); // 关闭确认对话框
-              // 跳转到登录页面，并清除所有之前的页面栈
-              Navigator.of(context).pushAndRemoveUntil(
-                CupertinoPageRoute(builder: (context) => LoginPage()),
-                (route) => false,
-              );
-            },
+            onPressed: () => _performLogOut(),
           ),
         ],
       ),
+    );
+  }
+
+  void _performLogOut() async {
+    Navigator.of(context).pop(); // 关闭确认对话框
+
+    // 添加短暂延迟，让对话框关闭动画完成
+    await Future.delayed(Duration(milliseconds: 200));
+
+    // 显示精美的加载指示器
+    showCupertinoDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _LogoutLoadingIndicator(),
+    );
+
+    // 模拟登出处理时间
+    await Future.delayed(Duration(milliseconds: 800));
+
+    // 关闭加载指示器并跳转到登录页面
+    Navigator.of(context).pop(); // 关闭加载指示器
+
+    // 使用自定义的淡入淡出过渡动画
+    Navigator.of(context).pushAndRemoveUntil(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
+        transitionDuration: Duration(milliseconds: 400),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+      (route) => false,
     );
   }
 
@@ -427,6 +453,50 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// 简洁的登出加载指示器
+class _LogoutLoadingIndicator extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 140,
+        height: 120,
+        decoration: BoxDecoration(
+          color: MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? CupertinoColors.systemGrey6
+                    .resolveFrom(context)
+                    .withOpacity(0.9)
+              : CupertinoColors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: CupertinoColors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 简单的系统加载指示器
+            CupertinoActivityIndicator(radius: 18),
+            SizedBox(height: 16),
+            Text(
+              'Logging out...',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: CupertinoColors.label.resolveFrom(context),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
