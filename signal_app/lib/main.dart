@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   int selectedIndex = 0;
   bool isBottomSheetExpanded = false;
+  DateTime? _lastInboxTapTime;
 
   // 集合相关状态
   String selectedCollection = 'All';
@@ -48,8 +49,28 @@ class MyAppState extends ChangeNotifier {
   ];
 
   void setSelectedIndex(int index) {
+    // 检查是否是在Inbox标签页上重复点击
+    if (index == 0 && selectedIndex == 0) {
+      final now = DateTime.now();
+      if (_lastInboxTapTime == null ||
+          now.difference(_lastInboxTapTime!).inMilliseconds > 500) {
+        // 如果距离上次点击超过500ms，触发返回顶部并刷新
+        _lastInboxTapTime = now;
+        _handleInboxDoubleTap();
+        return;
+      }
+    }
+
     selectedIndex = index;
+    if (index == 0) {
+      _lastInboxTapTime = DateTime.now();
+    }
     notifyListeners();
+  }
+
+  // 处理Inbox标签的重复点击
+  void _handleInboxDoubleTap() {
+    HomePage.scrollToTopAndRefresh();
   }
 
   void toggleBottomSheet() {
@@ -118,7 +139,7 @@ class MyHomePage extends StatelessWidget {
   Widget _buildBody(MyAppState appState) {
     switch (appState.selectedIndex) {
       case 0:
-        return HomePage(appState: appState);
+        return HomePage(key: homePageKey, appState: appState);
       case 1:
         return ExplorePage();
       case 2:

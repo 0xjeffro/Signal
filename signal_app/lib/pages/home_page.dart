@@ -12,7 +12,18 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+
+  // 静态方法，用于从外部触发滚动到顶部并刷新
+  static void scrollToTopAndRefresh() {
+    final homePageState = homePageKey.currentState;
+    if (homePageState is _HomePageState) {
+      homePageState.scrollToTopAndRefresh();
+    }
+  }
 }
+
+// 全局键，用于从外部调用HomePage的方法
+final GlobalKey<State<HomePage>> homePageKey = GlobalKey<State<HomePage>>();
 
 class _HomePageState extends State<HomePage> {
   // 分页相关状态
@@ -104,6 +115,20 @@ class _HomePageState extends State<HomePage> {
     });
 
     print('刷新完成');
+  }
+
+  // 返回顶部并刷新的公开方法
+  Future<void> scrollToTopAndRefresh() async {
+    // 先滚动到顶部
+    await _scrollController.animateTo(
+      0,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
+
+    // 延迟一点时间让滚动动画完成，然后触发刷新
+    await Future.delayed(Duration(milliseconds: 100));
+    await _handleRefresh();
   }
 
   // 生成假消息数据
