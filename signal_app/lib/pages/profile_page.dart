@@ -210,17 +210,15 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: CupertinoColors.label.resolveFrom(context),
-              ),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: CupertinoColors.label.resolveFrom(context),
             ),
           ),
+          SizedBox(width: 16),
           Expanded(
             child: CupertinoTextField(
               controller: controller,
@@ -234,22 +232,20 @@ class _ProfilePageState extends State<ProfilePage> {
               placeholder: 'Tap to edit',
               placeholderStyle: TextStyle(
                 color: CupertinoColors.systemGrey3.resolveFrom(context),
-                fontSize: 15,
+                fontSize: 16,
               ),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.left,
               clearButtonMode: OverlayVisibilityMode.editing,
               textInputAction: TextInputAction.done,
+              enableInteractiveSelection: true,
+              autocorrect: false,
+              enableSuggestions: false,
+              keyboardType: TextInputType.text,
               onSubmitted: (value) {
                 // 点击键盘上的完成按钮收回键盘
                 FocusScope.of(context).unfocus();
               },
             ),
-          ),
-          SizedBox(width: 4),
-          Icon(
-            CupertinoIcons.pencil,
-            color: CupertinoColors.systemGrey3.resolveFrom(context),
-            size: 16,
           ),
         ],
       ),

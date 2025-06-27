@@ -1,4 +1,52 @@
-# CustomRefreshControl 使用说明
+# Widgets 组件库
+
+这里包含了可复用的UI组件，所有组件都采用iOS风格设计。
+
+## MessageCard 消息卡片组件
+
+一个用于显示消息内容的卡片组件，支持频道标签、时间、内容和观看数等信息显示。
+
+### 基本用法
+
+```dart
+import '../widgets/message_card.dart';
+
+MessageCard(
+  message: {
+    'title': '消息标题',
+    'content': '消息内容描述...',
+    'channel': '频道名称',
+    'channelColor': CupertinoColors.systemBlue,
+    'time': DateTime.now(),
+    'views': 1234,
+    'maxLines': 3,
+  },
+  onTap: () {
+    // 点击卡片的处理逻辑
+  },
+)
+```
+
+### 参数说明
+
+| 参数      | 类型                   | 说明           |
+| --------- | ---------------------- | -------------- |
+| `message` | `Map<String, dynamic>` | 消息数据对象   |
+| `onTap`   | `VoidCallback?`        | 可选的点击回调 |
+
+#### message 数据结构
+
+| 字段           | 类型       | 说明             |
+| -------------- | ---------- | ---------------- |
+| `title`        | `String`   | 消息标题         |
+| `content`      | `String`   | 消息内容         |
+| `channel`      | `String`   | 频道名称         |
+| `channelColor` | `Color`    | 频道标签颜色     |
+| `time`         | `DateTime` | 消息时间         |
+| `views`        | `int`      | 观看次数         |
+| `maxLines`     | `int`      | 内容显示最大行数 |
+
+## CustomRefreshControl 下拉刷新组件
 
 这是一个可复用的iOS风格下拉刷新组件，具有精美的动画效果和触觉反馈。
 

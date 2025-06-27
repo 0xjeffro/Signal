@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
 import '../widgets/custom_refresh_control.dart';
+import '../widgets/message_card.dart';
 
 class HomePage extends StatefulWidget {
   final MyAppState appState;
@@ -14,10 +15,94 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // 分页相关状态
+  int _currentPage = 1;
+  final int _pageSize = 20;
+  bool _isLoadingMore = false;
+  bool _hasMoreData = true;
+  List<Map<String, dynamic>> _allMessages = [];
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // 初始化数据加载
+  void _loadInitialData() {
+    _allMessages = List.generate(
+      _pageSize,
+      (index) => _generateFakeMessage(index),
+    );
+    _currentPage = 1;
+    _hasMoreData = true;
+  }
+
+  // 监听滚动事件
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      // 距离底部200像素时开始加载
+      if (!_isLoadingMore && _hasMoreData) {
+        _loadMoreData();
+      }
+    }
+  }
+
+  // 加载更多数据
+  Future<void> _loadMoreData() async {
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    print('开始加载第${_currentPage + 1}页数据');
+
+    // 模拟网络请求延迟
+    await Future.delayed(Duration(seconds: 1));
+
+    // 生成新的消息数据
+    final newMessages = List.generate(
+      _pageSize,
+      (index) => _generateFakeMessage(_allMessages.length + index),
+    );
+
+    setState(() {
+      _allMessages.addAll(newMessages);
+      _currentPage++;
+      _isLoadingMore = false;
+
+      // 模拟数据有限，加载到第5页就没有更多数据了
+      if (_currentPage >= 5) {
+        _hasMoreData = false;
+      }
+    });
+
+    print('第${_currentPage}页数据加载完成，当前共${_allMessages.length}条消息');
+  }
+
   Future<void> _handleRefresh() async {
     print('开始刷新');
     // 模拟网络请求
     await Future.delayed(Duration(seconds: 1));
+
+    // 重置分页状态并重新加载
+    setState(() {
+      _currentPage = 1;
+      _hasMoreData = true;
+      _isLoadingMore = false;
+      _loadInitialData();
+    });
+
     print('刷新完成');
   }
 
@@ -89,144 +174,6 @@ class _HomePageState extends State<HomePage> {
       'views': (index + 1) * 1234 + (index * 567),
       'maxLines': 2 + (index % 5), // 2-6行随机
     };
-  }
-
-  // 构建消息卡片
-  Widget _buildMessageCard(BuildContext context, Map<String, dynamic> message) {
-    return Container(
-      decoration: BoxDecoration(
-        color: MediaQuery.of(context).platformBrightness == Brightness.dark
-            ? CupertinoColors.systemGrey6.resolveFrom(context)
-            : CupertinoColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: CupertinoColors.systemGrey5
-              .resolveFrom(context)
-              .withOpacity(0.3),
-          width: 0.5,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 频道名称和时间
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: message['channelColor'].withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    message['channel'],
-                    style: TextStyle(
-                      color: message['channelColor'],
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  _formatTime(message['time']),
-                  style: TextStyle(
-                    color: CupertinoColors.systemGrey,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-
-            // 标题
-            Text(
-              message['title'],
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: CupertinoColors.label.resolveFrom(context),
-              ),
-            ),
-            SizedBox(height: 8),
-
-            // 内容
-            Text(
-              message['content'],
-              style: TextStyle(
-                fontSize: 14,
-                color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                height: 1.4,
-              ),
-              maxLines: message['maxLines'],
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 12),
-
-            // 底部信息
-            Row(
-              children: [
-                Icon(
-                  CupertinoIcons.eye,
-                  size: 14,
-                  color: CupertinoColors.systemGrey,
-                ),
-                SizedBox(width: 4),
-                Text(
-                  '${_formatViews(message['views'])} 次观看',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: CupertinoColors.systemGrey,
-                  ),
-                ),
-                Spacer(),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minSize: 0,
-                  child: Icon(
-                    CupertinoIcons.chevron_right,
-                    size: 16,
-                    color: CupertinoColors.systemGrey,
-                  ),
-                  onPressed: () {
-                    // 点击查看详情
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // 格式化时间显示
-  String _formatTime(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}分钟前';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}小时前';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}天前';
-    } else {
-      return '${time.month}月${time.day}日';
-    }
-  }
-
-  // 格式化观看次数
-  String _formatViews(int views) {
-    if (views < 1000) {
-      return views.toString();
-    } else if (views < 1000000) {
-      return '${(views / 1000).toStringAsFixed(1)}K';
-    } else {
-      return '${(views / 1000000).toStringAsFixed(1)}M';
-    }
   }
 
   // 构建集合选择器
@@ -340,17 +287,13 @@ class _HomePageState extends State<HomePage> {
   // 获取筛选后的消息列表
   List<Map<String, dynamic>> _getFilteredMessages() {
     final appState = context.watch<MyAppState>();
-    final allMessages = List.generate(
-      20,
-      (index) => _generateFakeMessage(index),
-    );
 
     if (appState.selectedCollection == 'All') {
-      return allMessages;
+      return _allMessages;
     }
 
     // 根据集合筛选消息
-    return allMessages.where((message) {
+    return _allMessages.where((message) {
       final channel = message['channel'] as String;
       return _isChannelInCollection(channel, appState.selectedCollection);
     }).toList();
@@ -374,6 +317,45 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // 构建底部加载指示器
+  Widget _buildLoadingIndicator() {
+    if (_isLoadingMore) {
+      // 正在加载更多
+      return Container(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            children: [
+              CupertinoActivityIndicator(),
+              SizedBox(height: 8),
+              Text(
+                'Loading...',
+                style: TextStyle(
+                  color: CupertinoColors.systemGrey,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else if (!_hasMoreData) {
+      // 没有更多数据
+      return Container(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Text(
+            'End of the line :-)',
+            style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 14),
+          ),
+        ),
+      );
+    } else {
+      // 还有更多数据，但暂时不显示任何内容
+      return SizedBox(height: 16);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -382,6 +364,7 @@ class _HomePageState extends State<HomePage> {
           ? CupertinoColors.systemBackground.resolveFrom(context)
           : Color(0xFFEEF0F4),
       child: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // 使用自定义的下拉刷新组件
           CustomRefreshControl(onRefresh: _handleRefresh),
@@ -451,10 +434,18 @@ class _HomePageState extends State<HomePage> {
               final message = filteredMessages[index];
               return Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: _buildMessageCard(context, message),
+                child: MessageCard(
+                  message: message,
+                  onTap: () {
+                    // 点击查看详情
+                  },
+                ),
               );
             }, childCount: _getFilteredMessages().length),
           ),
+
+          // 底部加载指示器
+          SliverToBoxAdapter(child: _buildLoadingIndicator()),
 
           // 底部间距，避免被bottom sheet遮挡
           SliverToBoxAdapter(child: SizedBox(height: 100)),
