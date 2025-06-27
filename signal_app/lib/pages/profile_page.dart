@@ -394,7 +394,11 @@ class _ProfilePageState extends State<ProfilePage>
           CupertinoDialogAction(
             isDestructiveAction: true,
             child: Text('Log Out'),
-            onPressed: () => _performLogOut(),
+            onPressed: () {
+              // 先关闭当前对话框，然后执行登出
+              Navigator.of(context).pop();
+              _performLogOut();
+            },
           ),
         ],
       ),
@@ -402,12 +406,13 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   void _performLogOut() async {
-    Navigator.of(context).pop(); // 关闭确认对话框
+    // 等待确认对话框完全关闭，确保动画完成
+    await Future.delayed(Duration(milliseconds: 400));
 
-    // 添加短暂延迟，让对话框关闭动画完成
-    await Future.delayed(Duration(milliseconds: 200));
+    // 检查组件是否还在挂载状态
+    if (!mounted) return;
 
-    // 显示精美的加载指示器
+    // 显示加载指示器
     showCupertinoDialog(
       context: context,
       barrierDismissible: false,
@@ -417,10 +422,19 @@ class _ProfilePageState extends State<ProfilePage>
     // 模拟登出处理时间
     await Future.delayed(Duration(milliseconds: 800));
 
-    // 关闭加载指示器并跳转到登录页面
-    Navigator.of(context).pop(); // 关闭加载指示器
+    // 检查组件是否还在挂载状态
+    if (!mounted) return;
 
-    // 使用自定义的淡入淡出过渡动画
+    // 使用 rootNavigator 确保能正确关闭对话框
+    Navigator.of(context, rootNavigator: true).pop();
+
+    // 等待对话框关闭动画完成
+    await Future.delayed(Duration(milliseconds: 200));
+
+    // 再次检查组件是否还在挂载状态
+    if (!mounted) return;
+
+    // 跳转到登录页面
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => LoginPage(),
