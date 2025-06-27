@@ -649,12 +649,15 @@ class _LoginPageState extends State<LoginPage> {
         spans.add(TextSpan(text: ' '));
       } else {
         if (inputDigitIndex < digitsOnly.length) {
-          // 已输入的位置用透明文字占位
+          // 已输入的位置用输入框背景色占位，实现真正的透明效果
           spans.add(
             TextSpan(
               text: fullPlaceholder[i],
               style: TextStyle(
-                color: CupertinoColors.systemBackground.resolveFrom(context),
+                color:
+                    MediaQuery.of(context).platformBrightness == Brightness.dark
+                    ? CupertinoColors.systemGrey6.resolveFrom(context)
+                    : CupertinoColors.white,
               ),
             ),
           );
@@ -742,9 +745,10 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   'New here? We\'ll create your account and send a code to verify your number.',
                   style: TextStyle(
-                    fontSize: 14,
-                    color: CupertinoColors.tertiaryLabel.resolveFrom(context),
-                    height: 1.3,
+                    fontSize: 15,
+                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                    height: 1.4,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
 
