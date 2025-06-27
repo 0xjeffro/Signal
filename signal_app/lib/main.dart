@@ -41,11 +41,12 @@ class MyAppState extends ChangeNotifier {
   String selectedCollection = 'All';
   List<String> collections = [
     'All',
-    'iOS开发',
-    'Flutter',
-    'Apple',
-    '设计规范',
-    '工具技巧',
+    'Whales', // 巨鲸信号
+    'KOL', // KOL喊单
+    'DCA', // DCA自动投资
+    'News', // 新闻分析
+    'Futures', // 合约交易
+    'Spot', // 现货交易
   ];
 
   void setSelectedIndex(int index) {

@@ -134,8 +134,13 @@ class _HomePageState extends State<HomePage> {
   // 生成灵活的信号数据（巨鲸交易、KOL喊单、新闻等）
   Map<String, dynamic> _generateFlexibleSignal(int index) {
     final now = DateTime.now();
-    final randomHours = (index * 2 + 1) % 48;
-    final signalTime = now.subtract(Duration(hours: randomHours));
+    // 修改时间生成逻辑：让前几个信号是最近的，后面的逐渐变老
+    // 前10个信号在过去2小时内，这样能看到未读徽章
+    final randomMinutes = index < 10
+        ? (index * 10 + 5) %
+              120 // 前10个信号：5-115分钟前
+        : (index * 2 + 1) * 60 % (48 * 60); // 后面的信号：更早的时间
+    final signalTime = now.subtract(Duration(minutes: randomMinutes));
 
     // 30% 巨鲸交易信号
     if (index % 10 < 3) {
@@ -542,42 +547,53 @@ class _HomePageState extends State<HomePage> {
           final collection = appState.collections[index];
           final isSelected = collection == appState.selectedCollection;
           final isAll = collection == 'All';
+          final unreadCount = _getUnreadCount(collection);
 
           return Padding(
             key: ValueKey(collection),
             padding: EdgeInsets.only(right: 6.0),
             child: GestureDetector(
               onTap: () => appState.setSelectedCollection(collection),
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? CupertinoColors.systemBlue
-                      : CupertinoColors.systemGrey6.resolveFrom(context),
-                  borderRadius: BorderRadius.circular(16),
-                  border: isAll
-                      ? null
-                      : Border.all(
-                          color: CupertinoColors.systemGrey4
-                              .resolveFrom(context)
-                              .withOpacity(0.3),
-                          width: 0.5,
-                        ),
-                ),
-                child: Center(
-                  child: Text(
-                    collection,
-                    style: TextStyle(
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
                       color: isSelected
-                          ? CupertinoColors.white
-                          : CupertinoColors.secondaryLabel.resolveFrom(context),
-                      fontSize: 13,
-                      fontWeight: isSelected
-                          ? FontWeight.w500
-                          : FontWeight.normal,
+                          ? CupertinoColors.systemBlue
+                          : CupertinoColors.systemGrey6.resolveFrom(context),
+                      borderRadius: BorderRadius.circular(16),
+                      border: isAll
+                          ? null
+                          : Border.all(
+                              color: CupertinoColors.systemGrey4
+                                  .resolveFrom(context)
+                                  .withOpacity(0.3),
+                              width: 0.5,
+                            ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        collection,
+                        style: TextStyle(
+                          color: isSelected
+                              ? CupertinoColors.white
+                              : CupertinoColors.secondaryLabel.resolveFrom(
+                                  context,
+                                ),
+                          fontSize: 13,
+                          fontWeight: isSelected
+                              ? FontWeight.w500
+                              : FontWeight.normal,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  // 未读信号徽章
+                  if (unreadCount > 0 && !isSelected)
+                    _buildUnreadBadge(unreadCount),
+                ],
               ),
             ),
           );
@@ -594,23 +610,23 @@ class _HomePageState extends State<HomePage> {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: Text('创建新集合'),
+        title: Text('Create New Collection'),
         content: Padding(
           padding: EdgeInsets.only(top: 12),
           child: CupertinoTextField(
             controller: controller,
-            placeholder: '输入集合名称',
+            placeholder: 'Enter collection name (e.g., "Meme Coins")',
             autofocus: true,
           ),
         ),
         actions: [
           CupertinoDialogAction(
-            child: Text('取消'),
+            child: Text('Cancel'),
             onPressed: () => Navigator.of(context).pop(),
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
-            child: Text('创建'),
+            child: Text('Create'),
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
                 appState.addCollection(controller.text.trim());
@@ -638,22 +654,99 @@ class _HomePageState extends State<HomePage> {
     }).toList();
   }
 
-  // 判断频道是否属于指定集合
+  // 判断信号是否属于指定集合
   bool _isChannelInCollection(String channel, String collection) {
     switch (collection) {
-      case 'iOS开发':
-        return ['iOS开发频道', 'SwiftUI精选', 'Xcode技巧'].contains(channel);
-      case 'Flutter':
-        return ['Flutter社区', 'Flutter实战', 'Dart语言'].contains(channel);
-      case 'Apple':
-        return ['Apple Developer', 'iOS开发频道', 'SwiftUI精选'].contains(channel);
-      case '设计规范':
-        return ['设计规范', 'iOS开发频道'].contains(channel);
-      case '工具技巧':
-        return ['Xcode技巧', 'App Store指南', '移动开发者'].contains(channel);
+      case 'Whales':
+        // 巨鲸信号：包含所有巨鲸地址
+        return ['0x7f...a9e2', '0x1a...b8c4', '0x2d...f3a1'].contains(channel);
+      case 'KOL':
+        // KOL信号：包含所有KOL
+        return [
+          'CryptoKing',
+          'BlockchainBull',
+          'AltcoinAlpha',
+        ].contains(channel);
+      case 'DCA':
+        // DCA信号：自动投资机器人
+        return channel == 'DCA Bot';
+      case 'News':
+        // 新闻信号：各大资讯平台
+        return ['CoinDesk', 'CryptoNews', 'BlockBeats'].contains(channel);
+      case 'Futures':
+        // 合约交易：包含有杠杆的信号（通过检查customData中是否有Leverage字段）
+        return _hasLeverageData(channel);
+      case 'Spot':
+        // 现货交易：不包含杠杆的交易信号
+        return _isSpotTrading(channel);
       default:
         return true;
     }
+  }
+
+  // 检查是否包含杠杆数据（合约交易）
+  bool _hasLeverageData(String channel) {
+    // 巨鲸信号通常包含杠杆信息
+    return ['0x7f...a9e2', '0x1a...b8c4', '0x2d...f3a1'].contains(channel);
+  }
+
+  // 检查是否为现货交易
+  bool _isSpotTrading(String channel) {
+    // KOL信号和新闻通常是现货相关
+    return [
+      'CryptoKing',
+      'BlockchainBull',
+      'AltcoinAlpha',
+      'CoinDesk',
+      'CryptoNews',
+      'BlockBeats',
+    ].contains(channel);
+  }
+
+  // 获取指定集合的未读信号数量
+  int _getUnreadCount(String collection) {
+    if (collection == 'All') {
+      // All集合显示总的未读数量
+      return _allMessages.where((message) => _isRecentSignal(message)).length;
+    }
+
+    // 其他集合显示该集合的未读数量
+    return _allMessages.where((message) {
+      final channel = message['channel'] as String;
+      return _isChannelInCollection(channel, collection) &&
+          _isRecentSignal(message);
+    }).length;
+  }
+
+  // 判断是否为最近的信号（30分钟内为未读）
+  bool _isRecentSignal(Map<String, dynamic> message) {
+    final messageTime = message['time'] as DateTime;
+    final now = DateTime.now();
+    final difference = now.difference(messageTime);
+    // 只有30分钟内的信号才算未读，这样红点会更少更有意义
+    return difference.inMinutes < 30;
+  }
+
+  // 构建未读信号徽章 - 小红点
+  Widget _buildUnreadBadge(int count) {
+    return Positioned(
+      top: 2,
+      right: 2,
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemRed,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? CupertinoColors.systemBackground.resolveFrom(context)
+                : Color(0xFFEEF0F4),
+            width: 1,
+          ),
+        ),
+      ),
+    );
   }
 
   // 构建底部加载指示器
