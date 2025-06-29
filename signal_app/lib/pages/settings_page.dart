@@ -46,11 +46,11 @@ class _SettingsPageState extends State<SettingsPage> {
                       onTap: () => _showComingSoon(context, 'Wallet'),
                     ),
                     _SettingsItem(
-                      icon: CupertinoIcons.hammer,
+                      icon: CupertinoIcons.antenna_radiowaves_left_right,
                       iconColor: CupertinoColors.systemPurple,
-                      title: 'Developer',
-                      subtitle: 'Create signals, Manage channels',
-                      onTap: () => _showComingSoon(context, 'Developer'),
+                      title: 'Signal Channels',
+                      subtitle: 'Create & manage your signal channels',
+                      onTap: () => _showComingSoon(context, 'Signal Channels'),
                     ),
                     _SettingsItem(
                       icon: CupertinoIcons.link,
